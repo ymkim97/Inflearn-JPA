@@ -1,4 +1,4 @@
 # Inflearn-JPA
 Inflearn JPA Study
 
-/jpabook - JPA-1
+📂/jpabook - JPA-1
