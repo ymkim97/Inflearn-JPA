@@ -11,13 +11,13 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import jpabook.jpashop.Exception.NotEnoughStockException;
 import jpabook.jpashop.domain.Category;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 @Table(name = "item")
@@ -34,4 +34,17 @@ public abstract class Item {
 
 	@ManyToMany(mappedBy = "items")
 	private List<Category> categories = new ArrayList<>();
+
+	// ==비즈니스 로직==//
+
+	public void addStock(int quantity) {
+		this.stockQuantity += quantity;
+	}
+
+	public void removeStock(int quantity) {
+		int restStock = this.stockQuantity - quantity;
+		if (restStock < 0) {
+			throw new NotEnoughStockException("Need more stock");
+		}
+	}
 }
