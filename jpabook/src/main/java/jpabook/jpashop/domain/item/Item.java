@@ -18,6 +18,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 @Table(name = "item")
@@ -46,5 +47,6 @@ public abstract class Item {
 		if (restStock < 0) {
 			throw new NotEnoughStockException("Need more stock");
 		}
+		this.stockQuantity = restStock;
 	}
 }
