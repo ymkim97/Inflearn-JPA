@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import jpabook.jpashop.domain.Member;
-import jpabook.jpashop.repsoitory.MemberRepository;
+import jpabook.jpashop.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,5 +35,11 @@ public class MemberService {
 
 	public Member findOne(Long memberId) {
 		return memberRepository.findOne(memberId);
+	}
+
+	@Transactional
+	public void update(Long id, String name) {
+		Member member = memberRepository.findOne(id);
+		member.setName(name);
 	}
 }

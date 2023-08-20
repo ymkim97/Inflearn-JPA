@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import jpabook.jpashop.domain.Member;
-import jpabook.jpashop.repsoitory.MemberRepository;
+import jpabook.jpashop.repository.MemberRepository;
 
 @SpringBootTest
 @Transactional

@@ -15,7 +15,7 @@ import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
-import jpabook.jpashop.repsoitory.OrderRepository;
+import jpabook.jpashop.repository.OrderRepository;
 
 @SpringBootTest
 @Transactional

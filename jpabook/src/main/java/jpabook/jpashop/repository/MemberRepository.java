@@ -1,4 +1,4 @@
-package jpabook.jpashop.repsoitory;
+package jpabook.jpashop.repository;
 
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberRepository {
 
-	private  final EntityManager em;
+	private final EntityManager em;
 
 	public void save(Member member) {
 		em.persist(member);
