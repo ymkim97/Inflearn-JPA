@@ -1,16 +1,24 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
 	List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
@@ -29,4 +37,26 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	List<Member> findListByUsername(String username); // 컬렉션
 	Member findMemberByUsername(String username); // 단건
 	Optional<Member> findOptionalByUsername(String username); // 단건 Optional
+
+	Page<Member> findByAge(int age, Pageable pageable);
+
+	@Modifying(clearAutomatically = true)
+	@Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+	int bulkAgePlus(@Param("age") int age);
+
+	@Query("select m from Member m left join fetch m.team")
+	List<Member> findMemberFetchJoin();
+
+	@Override
+	@EntityGraph(attributePaths = {"team"})
+	List<Member> findAll();
+
+	@EntityGraph(attributePaths = {"team"})
+	List<Member> findEntityGraphByUsername(@Param("username") String username);
+
+	@QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+	Member findReadOnlyByUsername(String username);
+
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	List<Member> findLockByUsername(String username);
 }

@@ -5,8 +5,13 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import study.datajpa.dto.MemberDto;
@@ -22,6 +27,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	TeamRepository teamRepository;
+
+	@PersistenceContext
+	EntityManager em;
 
 	@Test
 	void testMember() {
@@ -135,5 +143,89 @@ class MemberRepositoryTest {
 		memberRepository.save(member2);
 
 		Member aaa = memberRepository.findMemberByUsername("AAA");
+	}
+
+	@Test
+	void paging() {
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 10));
+		memberRepository.save(new Member("member3", 10));
+		memberRepository.save(new Member("member4", 10));
+		memberRepository.save(new Member("member5", 10));
+
+		int age = 10;
+		PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+		Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+		List<Member> content = page.getContent();
+		long totalElements = page.getTotalElements();
+
+		for (Member member : content) {
+			System.out.println("member = " + member);
+		}
+		System.out.println("totalElements = " + totalElements);
+	}
+
+	@Test
+	void bulkUpdate() {
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 19));
+		memberRepository.save(new Member("member3", 20));
+		memberRepository.save(new Member("member4", 21));
+		memberRepository.save(new Member("member5", 40));
+
+		int resultCount = memberRepository.bulkAgePlus(20);
+
+		assertThat(resultCount).isEqualTo(3);
+	}
+
+	@Test
+	void findMemberLazy() {
+		Team teamA = new Team("teamA");
+		Team teamB = new Team("teamB");
+		teamRepository.save(teamA);
+		teamRepository.save(teamB);
+
+		Member member1 = new Member("member1", 10, teamA);
+		Member member2 = new Member("member2", 10, teamB);
+		memberRepository.save(member1);
+		memberRepository.save(member2);
+
+		em.flush();
+		em.clear();
+
+		List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+		for (Member member : members) {
+			System.out.println("member = " + member.getUsername());
+		}
+	}
+
+	@Test
+	void queryHint() {
+		Member member1 = new Member("member1", 10);
+		memberRepository.save(member1);
+		em.flush();
+		em.clear();
+
+		Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+		findMember.setUsername("123");
+
+		em.flush();
+	}
+
+	@Test
+	void lock() {
+		Member member1 = new Member("member1", 10);
+		memberRepository.save(member1);
+		em.flush();
+		em.clear();
+
+		List<Member> result = memberRepository.findLockByUsername("member1");
+	}
+
+	@Test
+	void callCustom() {
+		List<Member> result = memberRepository.findMemberCustom();
 	}
 }
