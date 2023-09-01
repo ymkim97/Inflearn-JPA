@@ -25,11 +25,14 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnit;
 import java.util.List;
 import study.querydsl.dto.MemberDto;
+import study.querydsl.dto.MemberSearchCondition;
+import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.dto.QMemberDto;
 import study.querydsl.dto.UserDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
+import study.querydsl.repository.MemberJpaRepository;
 
 @SpringBootTest
 @Transactional
@@ -40,6 +43,9 @@ class QuerydslBasicTest {
 	EntityManager em;
 
 	JPAQueryFactory queryFactory;
+
+	@Autowired
+	MemberJpaRepository memberJpaRepository;
 
 	@BeforeEach
 	void before() {
@@ -671,5 +677,17 @@ class QuerydslBasicTest {
 		for (String s : result) {
 			System.out.println("s = " + s);
 		}
+	}
+
+	@Test
+	void searchTest() {
+		MemberSearchCondition condition = new MemberSearchCondition();
+		condition.setAgeGoe(35);
+		condition.setAgeLoe(40);
+		condition.setTeamName("teamB");
+
+		List<MemberTeamDto> result = memberJpaRepository.search(condition);
+
+		assertThat(result).extracting("username").containsExactly("member4");
 	}
 }
